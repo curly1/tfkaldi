@@ -7,7 +7,8 @@ import itertools
 import numpy as np
 import tensorflow as tf
 import classifiers.activation
-from classifiers.dnn import DNN
+#from classifiers.dnn import DNN
+from classifiers.cnn import CNN
 from trainer import CrossEnthropyTrainer
 from decoder import Decoder
 
@@ -71,8 +72,8 @@ class Nnet(object):
             activation = classifiers.activation.Dropout(
                 activation, float(self.conf['dropout']))
 
-        #create a DNN
-        self.dnn = DNN(
+        #create a CNN
+        self.cnn = CNN(
             num_labels, int(self.conf['num_hidden_layers']),
             int(self.conf['num_hidden_units']), activation,
             int(self.conf['add_layer_period']) > 0)
@@ -113,9 +114,9 @@ class Nnet(object):
             numutterances_per_minibatch = int(
                 self.conf['numutterances_per_minibatch'])
 
-        #put the DNN in a training environment
+        #put the CNN in a training environment
         trainer = CrossEnthropyTrainer(
-            self.dnn, self.input_dim, dispenser.max_input_length,
+            self.cnn, self.input_dim, dispenser.max_input_length,
             dispenser.max_target_length,
             float(self.conf['initial_learning_rate']),
             float(self.conf['learning_rate_decay']),
@@ -253,7 +254,7 @@ class Nnet(object):
         '''
 
         #create a decoder
-        decoder = Decoder(self.dnn, self.input_dim, reader.max_input_length)
+        decoder = Decoder(self.cnn, self.input_dim, reader.max_input_length)
 
         #read the prior
         prior = np.load(self.conf['savedir'] + '/prior.npy')

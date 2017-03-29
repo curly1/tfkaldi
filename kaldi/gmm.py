@@ -56,8 +56,7 @@ class GMM(object):
         os.chdir(self.conf.get('directories', 'kaldi_egs'))
 
         #do the alignment
-        os.system('''steps/align_si.sh --nj %s --cmd %s
-            --config %s/config/ali_%s %s %s %s %s/ali''' % (
+        os.system('''steps/align_si.sh --nj %s --cmd %s --config %s/config/ali_%s %s %s %s %s/ali''' % (
                 self.conf.get('general', 'num_jobs'),
                 self.conf.get('general', 'cmd'), current_dir, self.conf_file,
                 self.conf.get('directories', 'train_features') + '/'
@@ -68,8 +67,7 @@ class GMM(object):
 
         #convert alignments (transition-ids) to pdf-ids
         for i in range(int(self.conf.get('general', 'num_jobs'))):
-            os.system('''gunzip -c %s/ali/ali.%d.gz | ali-to-pdf
-                %s/ali/final.mdl ark:- ark,t:- | gzip >  %s/ali/pdf.%d.gz''' % (
+            os.system('''gunzip -c %s/ali/ali.%d.gz | ali-to-pdf %s/ali/final.mdl ark:- ark,t:- | gzip >  %s/ali/pdf.%d.gz''' % (
                     self.conf.get('directories', 'expdir') + '/' + self.name,
                     i+1, self.conf.get('directories', 'expdir') + '/'
                     + self.name, self.conf.get('directories', 'expdir')
@@ -87,8 +85,7 @@ class GMM(object):
         #go to kaldi egs dir
         os.chdir(self.conf.get('directories', 'kaldi_egs'))
 
-        os.system('''steps/decode.sh --cmd %s --nj %s %s/graph %s %s/decode
-        | tee %s/decode.log || exit 1;''' % (
+        os.system('''steps/decode.sh --cmd %s --nj %s %s/graph %s %s/decode | tee %s/decode.log || exit 1;''' % (
             self.conf.get('general', 'cmd'),
             self.conf.get('general', 'num_jobs'),
             self.conf.get('directories', 'expdir') + '/' + self.name,
