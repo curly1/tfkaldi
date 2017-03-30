@@ -54,7 +54,6 @@ class CNN(Classifier):
 
             print inputs[1]
 
-
             for i in range(num_time_steps):
               forward = tf.pad(inputs[:, i+1:, :], [[0,0][0,i+1],[0,0]])
               backward  = tf.pad(inputs[:, :-i-1, :], [[0,0][i+1,0],[0,0]])
