@@ -7,6 +7,7 @@ from classifier import Classifier
 from layer import FFLayer, Conv2dLayer
 from activation import TfActivation
 
+
 class CNN(Classifier):
     '''This class is a graph for feedforward fully connected neural nets.'''
 
@@ -14,7 +15,6 @@ class CNN(Classifier):
                  layerwise_init=True):
         '''
         CNN constructor
-
         Args:
             output_dim: the DNN output dimension
             num_layers: number of hidden layers
@@ -38,7 +38,6 @@ class CNN(Classifier):
                  scope=None):
         '''
         Add the CNN variables and operations to the graph
-
         '''
 
         with tf.variable_scope(scope or type(self).__name__, reuse=reuse):
@@ -49,17 +48,35 @@ class CNN(Classifier):
             #output layer
             outlayer = FFLayer(self.output_dim,
                               TfActivation(None, lambda(x): x), 0)
+            
+            time_steps = [inputs]
+            num_time_steps = 11
 
+            print inputs[1]
+
+
+            for i in range(num_time_steps):
+              forward = tf.pad(inputs[:, i+1:, :], [[0,0][0,i+1],[0,0]])
+              backward  = tf.pad(inputs[:, :-i-1, :], [[0,0][i+1,0],[0,0]])
+              time_steps += [forward, backward]
+            logits = tf.pack(time_steps, axis=3)
 
             #apply the input layer
+            #logits = tf.expand_dims(inputs, 3)
             for l in range(1, self.num_layers):
-              logits = conv(inputs, seq_length, is_training, 'convlayer' + str(l))
+              logits = conv(logits, seq_length, is_training, 'convlayer' + str(l))
               logits = tf.nn.relu(logits)
+              
+            #stack all the output channels for the final layer
+            logits = tf.reshape(logits, list(logits.get_shape()[0:2] + [-1]))
+
+            #convert the logits to nonsequence logits for the output layer
+            logits = seq_convertors.seq2nonseq(logits, seq_length)
 
             logits = outlayer(logits, seq_length, is_training, 'outlayer')
             
             #convert the logits to sequence logits to match expected output
-            seq_logits = seq_convertors.nonseq2seq(logits, seq_length, len(inputs))
+            logits = seq_convertors.nonseq2seq(logits, seq_length, int(inputs.get_shape()[0]))
 
             #create a saver
             saver = tf.train.Saver()
@@ -69,26 +86,3 @@ class CNN(Classifier):
        
         return seq_logits, seq_length, saver, control_ops
 
-
-class Callable(object):
-    '''A class for an object that is callable'''
-
-    def __init__(self, value):
-        '''
-        Callable constructor
-
-        Args:
-            tensor: a tensor
-        '''
-
-        self.value = value
-
-    def __call__(self):
-        '''
-        get the object
-
-        Returns:
-            the object
-        '''
-
-        return self.value

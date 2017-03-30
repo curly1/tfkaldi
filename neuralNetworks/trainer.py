@@ -46,7 +46,7 @@ class Trainer(object):
                 name='inputs')
 
             #split the 3D input tensor in a list of batch_size*input_dim tensors
-            split_inputs = tf.unstack(self.inputs)
+            split_inputs = tf.unpack(self.inputs)
 
             #reference labels
             self.targets = tf.placeholder(
@@ -56,7 +56,7 @@ class Trainer(object):
 
             #split the 3D targets tensor in a list of batch_size*input_dim
             #tensors
-            split_targets = tf.unstack(self.targets)
+            split_targets = tf.unpack(self.targets)
 
             #the length of all the input sequences
             self.input_seq_length = tf.placeholder(

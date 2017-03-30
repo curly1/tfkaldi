@@ -89,16 +89,19 @@ class Conv2dLayer(object):
         '''
 
         with tf.variable_scope(scope or type(self).__name__):
+           
+            numchannels_in = int(inputs.get_shape()[3])
+            input_dim = self.kernel_size * self.kernel_size * numchannels_in
             
-            input_dim = self.kernel_size * self.kernel_size
-                        
+            print "input_dim", input_dim
+            print "num_channels_in", numchannels_in
+            print inputs.get_shape()
+ 
             stddev = 1/input_dim**0.5
-            inputs = seq_convertors.seq2nonseq(inputs, seq_length) 
-            inputs = seq_convertors.nonseq2seq(inputs, seq_length, int(inputs.get_shape()[1]))
 
             #the filter parameters
             w = tf.get_variable(
-                'filter', [self.kernel_size, self.kernel_size, 1, self.num_units],
+                'filter', [self.kernel_size, self.kernel_size, numchannels_in, self.num_units],
                 initializer=tf.random_normal_initializer(stddev=stddev))
 
             #the bias parameters
@@ -108,12 +111,10 @@ class Conv2dLayer(object):
 
             #do the convolution
             out = tf.nn.conv2d(inputs, w, [1, self.stride, self.stride, 1], padding='SAME')
-           
-            inputs = seq_convertors.seq2nonseq(inputs, seq_length)            
  
             #add the bias
-            #out = seq_convertors.seq2nonseq(out, seq_length)
-            out += b
-            #out = seq_convertors.nonseq2seq(out, seq_length, int(inputs.get_shape()[1]))
-
+            out = tf.nn.bias_add(out, b)
+            
         return out
+
+
