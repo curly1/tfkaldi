@@ -4,6 +4,7 @@ Neural network layers '''
 import tensorflow as tf
 from neuralNetworks import ops 
 import seq_convertors
+import sys
 
 class FFLayer(object):
     '''This class defines a fully connected feed forward layer'''
@@ -48,6 +49,10 @@ class FFLayer(object):
                 biases = tf.get_variable(
                     'biases', [self.output_dim],
                     initializer=tf.constant_initializer(0))
+            
+            print "inputs", inputs
+            print "weights", weights
+            print "biases", biases
 
             #apply weights and biases
             with tf.variable_scope('linear', reuse=reuse):
@@ -93,9 +98,9 @@ class Conv2dLayer(object):
             numchannels_in = int(inputs.get_shape()[3])
             input_dim = self.kernel_size * self.kernel_size * numchannels_in
             
-            print "input_dim", input_dim
-            print "num_channels_in", numchannels_in
-            print inputs.get_shape()
+            #print "input_dim", input_dim
+            #print "num_channels_in", numchannels_in
+            #print inputs.get_shape()
  
             stddev = 1/input_dim**0.5
 
@@ -108,7 +113,7 @@ class Conv2dLayer(object):
             b = tf.get_variable(
                 'bias', [self.num_units],
                 initializer=tf.random_normal_initializer(stddev=stddev))
-
+            
             #do the convolution
             out = tf.nn.conv2d(inputs, w, [1, self.stride, self.stride, 1], padding='SAME')
  

@@ -55,8 +55,8 @@ class FeatureReader(object):
         utt_mat = apply_cmvn(utt_mat, cmvn_stats)
 
         #splice the utterance
-        #don't splice when doing CNN training
-        #utt_mat = splice(utt_mat, self.context_width)
+        #don't splice when doing CNN training?
+        utt_mat = splice(utt_mat, self.context_width)
 
         return utt_id, utt_mat, looped
 

@@ -275,11 +275,15 @@ class Trainer(object):
         #get a list of sequence lengths
         input_seq_length = [i.shape[0] for i in inputs]
         output_seq_length = [t.shape[0] for t in targets]
-
+        
+        #print input_seq_length
         #fill the inputs to have a round number of minibatches
         added_inputs = (inputs + (len(inputs)%self.numutterances_per_minibatch)
                         *[np.zeros([self.max_input_length,
                                     inputs[0].shape[1]])])
+        #import sys
+        #sys.exit()
+
 
         added_targets = (
             targets + (len(targets)%self.numutterances_per_minibatch)

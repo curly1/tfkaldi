@@ -88,6 +88,12 @@ class BatchDispenser(object):
                 if utt_mat is None:
                     print 'WARNING %s is too short to splice' % utt_id
 
+        #import sys
+        #print len(batch_inputs)
+        #s = tf.unpack(batch_inputs, axis=1)
+        #print np.shape(batch_inputs[2])
+        #sys.exit()
+
         return batch_inputs, batch_targets
 
 
