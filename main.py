@@ -2,6 +2,8 @@
 run this file to go through the neural net training procedure, look at the config files in the config directory to modify the settings'''
 
 import os
+import sys
+import numpy as np
 from six.moves import configparser
 from neuralNetworks import nnet
 from processing import ark, prepare_data, feature_reader, batchdispenser, target_coder
@@ -21,8 +23,8 @@ TEST_TRI = False			#required if the performance of the triphone GMM is tested
 TRAIN_LDA = False			#required if the LDA GMM is used for alignments
 ALIGN_LDA = False			#required if the LDA GMM is used for alignments
 TEST_LDA = False			#required if the performance of the LDA GMM is tested
-TRAIN_NNET = True			#required
-TEST_NNET = False			#required if the performance of the DNN is tested
+TRAIN_NNET = False			#required
+TEST_NNET = True			#required if the performance of the DNN is tested
 
 
 #read config file
@@ -151,6 +153,13 @@ if TRAIN_NNET:
     coder = target_coder.AlignmentCoder(lambda x, y: x, num_labels)
 
     dispenser = batchdispenser.AlignmentBatchDispenser(featreader, coder, int(config.get('nnet', 'batch_size')), alifile)
+
+    #compute the state prior and write it to the savedir
+    #prior = dispenser.compute_target_count().astype(np.float32)
+    #prior = prior/prior.sum()
+    #savedir = config.get('directories', 'expdir') + '/' + config.get('nnet', 'name')
+    #np.save(savedir + '/prior.npy', prior)
+    #sys.exit()
 
     #train the neural net
     print '------- training neural net ----------'
