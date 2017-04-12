@@ -29,7 +29,8 @@ TEST_NNET = True			#required if the performance of the DNN is tested
 
 #read config file
 config = configparser.ConfigParser()
-config.read('config/config_AURORA4.cfg')
+config_dir = 'config/config_AURORA4.cfg') 
+config.read(config_dir)
 current_dir = os.getcwd()
 
 #compute the features of the training set for GMM training
@@ -132,6 +133,11 @@ nnet = nnet.Nnet(config, input_dim, num_labels)
 
 if TRAIN_NNET:
 
+    #copy config file to expdir
+    if os.path.isfile(config.get('directories', 'expdir') + '/conf.cfg'):
+      os.remove(config.get('directories', 'expdir') + '/conf.cfg')
+    os.system('cp %s %s' % (config_dir, config.get('directories', 'expdir') + '/' + config.get('nnet', 'name') + '/conf.cfg'))
+ 
     #only shuffle if we start with initialisation
     if config.get('nnet', 'starting_step') == '0':
         #shuffle the examples on disk
