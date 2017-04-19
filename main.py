@@ -29,7 +29,7 @@ TEST_NNET = True			#required if the performance of the DNN is tested
 
 #read config file
 config = configparser.ConfigParser()
-config_dir = 'config/config_AURORA4.cfg') 
+config_dir = ('config/config_AURORA4.cfg') 
 config.read(config_dir)
 current_dir = os.getcwd()
 
@@ -161,10 +161,10 @@ if TRAIN_NNET:
     dispenser = batchdispenser.AlignmentBatchDispenser(featreader, coder, int(config.get('nnet', 'batch_size')), alifile)
 
     #compute the state prior and write it to the savedir
-    #prior = dispenser.compute_target_count().astype(np.float32)
-    #prior = prior/prior.sum()
-    #savedir = config.get('directories', 'expdir') + '/' + config.get('nnet', 'name')
-    #np.save(savedir + '/prior.npy', prior)
+    prior = dispenser.compute_target_count().astype(np.float32)
+    prior = prior/prior.sum()
+    savedir = config.get('directories', 'expdir') + '/' + config.get('nnet', 'name')
+    np.save(savedir + '/prior.npy', prior)
     #sys.exit()
 
     #train the neural net

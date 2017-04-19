@@ -50,10 +50,10 @@ class FFLayer(object):
                     'biases', [self.output_dim],
                     initializer=tf.constant_initializer(0))
             
-            print "inputs", inputs
-            print "weights", weights
-            print "biases", biases
-
+            #print "inputs", inputs
+            #print "weights", weights
+            #print "biases", biases
+            #sys.exit()
             #apply weights and biases
             with tf.variable_scope('linear', reuse=reuse):
                 linear = tf.matmul(inputs, weights) + biases
@@ -79,12 +79,12 @@ class Conv2dLayer(object):
         self.kernel_size = kernel_size
         self.stride = stride
 
-    def __call__(self, inputs, seq_length, is_training=False, scope=None):
+    def __call__(self, inputs, seq_length, is_training=False, reuse=False, scope=None):
         '''
         Create the variables and do the forward computation
         Args:
             inputs: the input to the layer as a
-                [batch_size, max_length, dim] tensor
+                [batch_size, max_length, dim, num_channels] tensor
             seq_length: the length of the input sequences
             is_training: whether or not the network is in training mode
             scope: The variable scope sets the namespace under which
@@ -93,8 +93,8 @@ class Conv2dLayer(object):
             the outputs which is a [batch_size, max_length/stride, num_units]
         '''
 
-        with tf.variable_scope(scope or type(self).__name__):
-           
+        with tf.variable_scope(scope or type(self).__name__, reuse=reuse):
+            #print inputs 
             numchannels_in = int(inputs.get_shape()[3])
             input_dim = self.kernel_size * self.kernel_size * numchannels_in
             
@@ -113,7 +113,7 @@ class Conv2dLayer(object):
             b = tf.get_variable(
                 'bias', [self.num_units],
                 initializer=tf.random_normal_initializer(stddev=stddev))
-            
+
             #do the convolution
             out = tf.nn.conv2d(inputs, w, [1, self.stride, self.stride, 1], padding='SAME')
  

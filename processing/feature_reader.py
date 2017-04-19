@@ -2,6 +2,7 @@
 reading features and applying cmvn and splicing them'''
 
 import ark
+import sys
 import numpy as np
 import readfiles
 
@@ -56,7 +57,7 @@ class FeatureReader(object):
 
         #splice the utterance
         #don't splice when doing CNN training?
-        utt_mat = splice(utt_mat, self.context_width)
+        #utt_mat = splice(utt_mat, self.context_width)
 
         return utt_id, utt_mat, looped
 
@@ -132,15 +133,23 @@ def splice(utt, context_width):
     #return None if utterance is too short
     if utt.shape[0]<1+2*context_width:
         return None
-
+    
+    #print utt[-1,:-1] 
+ 
     #create spliced utterance holder
     utt_spliced = np.zeros(
         shape=[utt.shape[0], utt.shape[1]*(1+2*context_width)],
         dtype=np.float32)
-
+     
     #middle part is just the uttarnce
     utt_spliced[:, context_width*utt.shape[1]:
                 (context_width+1)*utt.shape[1]] = utt
+    
+    #print utt_spliced[-1]
+    #print len(utt_spliced[-1])
+    #print utt_spliced.shape
+    #print np.reshape(utt_spliced[-1], (11,40))
+    #sys.exit()
 
     for i in range(context_width):
 
@@ -149,9 +158,11 @@ def splice(utt, context_width):
                     (context_width-i-1)*utt.shape[1]:
                     (context_width-i)*utt.shape[1]] = utt[0:utt.shape[0]-i-1, :]
 
-         #add right context
+        #add right context
         utt_spliced[0:utt_spliced.shape[0]-i-1,
                     (context_width+i+1)*utt.shape[1]:
                     (context_width+i+2)*utt.shape[1]] = utt[i+1:utt.shape[0], :]
 
+    #print utt_spliced[0]
+    #sys.exit()
     return utt_spliced
